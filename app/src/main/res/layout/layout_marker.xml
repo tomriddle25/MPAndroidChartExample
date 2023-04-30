@@ -4,71 +4,72 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/labelContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_curved"
-        android:backgroundTint="#D6D6D6"
-        android:padding="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+<!--    <LinearLayout-->
+<!--        android:id="@+id/labelContainer"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="@drawable/bg_curved"-->
+<!--        android:backgroundTint="#D6D6D6"-->
+<!--        android:padding="4dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent">-->
 
-        <TextView
-            android:id="@+id/incoming"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="2dp"
-            android:background="@drawable/bg_curved"
-            android:backgroundTint="@color/green"
-            android:padding="6dp"
-            android:text="Incoming"
-            android:textColor="@color/white"
-            android:textSize="12sp" />
+<!--        <TextView-->
+<!--            android:id="@+id/incoming"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginRight="2dp"-->
+<!--            android:background="@drawable/bg_curved"-->
+<!--            android:backgroundTint="@color/green"-->
+<!--            android:padding="6dp"-->
+<!--            android:text="Incoming"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:textSize="12sp" />-->
 
-        <TextView
-            android:id="@+id/invested"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="2dp"
-            android:background="@drawable/bg_curved"
-            android:backgroundTint="@color/blue"
-            android:padding="6dp"
-            android:text="Invested"
-            android:textColor="@color/white"
-            android:textSize="12sp" />
+<!--        <TextView-->
+<!--            android:id="@+id/invested"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginRight="2dp"-->
+<!--            android:background="@drawable/bg_curved"-->
+<!--            android:backgroundTint="@color/blue"-->
+<!--            android:padding="6dp"-->
+<!--            android:text="Invested"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:textSize="12sp" />-->
 
-        <TextView
-            android:id="@+id/outgoing"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_curved"
-            android:backgroundTint="@color/red"
-            android:padding="6dp"
-            android:text="Outgoing"
-            android:textColor="@color/white"
-            android:textSize="12sp" />
-    </LinearLayout>
+<!--        <TextView-->
+<!--            android:id="@+id/outgoing"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="@drawable/bg_curved"-->
+<!--            android:backgroundTint="@color/red"-->
+<!--            android:padding="6dp"-->
+<!--            android:text="Outgoing"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:textSize="12sp" />-->
+<!--    </LinearLayout>-->
 
-    <ImageView
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:id="@+id/circle"
-        android:src="@drawable/circle_with_stroke"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/labelContainer"
-        />
-    <View
-        android:layout_width="4dp"
-        android:layout_height="0dp"
-        android:background="#BCBCBC"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/circle"
+<!--    <ImageView-->
+<!--        android:layout_width="12dp"-->
+<!--        android:layout_height="12dp"-->
+<!--        android:layout_marginTop="-4dp"-->
+<!--        android:id="@+id/circle"-->
+<!--        android:src="@drawable/circle_with_stroke"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/labelContainer"-->
+<!--        />-->
+<!--    <View-->
+<!--        android:layout_width="2dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:background="#BCBCBC"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/circle"-->
 
-        />
+<!--        />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

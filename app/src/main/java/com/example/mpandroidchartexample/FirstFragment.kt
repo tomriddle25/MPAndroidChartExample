@@ -1,8 +1,13 @@
 package com.example.mpandroidchartexample
 
 import android.content.Context
+import android.content.res.Resources
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
 import android.media.SoundPool
 import android.os.Build
 import android.os.Bundle
@@ -25,6 +30,8 @@ import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.IMarker
+import com.github.mikephil.charting.components.MarkerImage
+import com.github.mikephil.charting.components.MarkerView
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -201,11 +208,11 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
                 valueFormatter = MonthValueFormatter()
                 gridLineWidth = 0f
                 position = XAxis.XAxisPosition.BOTTOM
-                setDrawGridLines(false)
-                setDrawAxisLine(false)
+                setDrawGridLines(true)
+                setDrawAxisLine(true)
                 setDrawLabels(true)
                 axisMaximum = 18f
-                axisMinimum = -3f
+                axisMinimum = -3.5f
 //                setLabelCount(12, false)
             }
             axisLeft.isEnabled = false
@@ -224,15 +231,14 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
             isScaleYEnabled = false
             isDoubleTapToZoomEnabled = false
             isHighlightPerDragEnabled = true
-            setDrawGridBackground(false)
-            setDrawBorders(false)
-
-            setExtraOffsets(
-                0f ,
-                resources.getDimensionPixelSize(R.dimen.chart_padding_top).toFloat(),
-                0f,
-                resources.getDimensionPixelSize(R.dimen.chart_padding_bottom).toFloat()
-            )
+//            setDrawGridBackground(true)
+//            setDrawBorders(true)
+//            setExtraOffsets(
+//                0f,
+//                resources.getDimensionPixelSize(R.dimen.chart_padding_top).toFloat(),
+//                0f,
+//                resources.getDimensionPixelSize(R.dimen.chart_padding_bottom).toFloat()
+//            )
 
             setOnChartValueSelectedListener(this@FirstFragment)
             onChartGestureListener = this@FirstFragment
@@ -241,8 +247,8 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
             isDragDecelerationEnabled = true
             dragDecelerationFrictionCoef = 0.3f
 
-            val markerView = CenterMarkerView(requireContext(), R.layout.layout_marker, this)
-            marker = markerView
+            marker = Marker(this)
+
             invalidate()
             if (highlighted == null || highlighted?.isEmpty() == true) {
                 highlightValue(0f, 0)
@@ -251,8 +257,10 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
     }
 
     private fun performVibration() {
-        binding.lineChart.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING)
-//
+        binding.lineChart.performHapticFeedback(
+            HapticFeedbackConstants.CLOCK_TICK,
+            HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+        )
     }
 
     private fun playTickSound() {
@@ -273,28 +281,25 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
 
         val index = e?.x?.toInt() ?: return
 
-        if(currentHighlight != null) {
+        if (currentHighlight != null) {
             performVibration()
             playTickSound()
         }
         val highlights = mutableListOf<Highlight>()
         val outgoingEntry = outgoingDataSet.getEntryForIndex(index)
-        if ( outgoingEntry != null) {
-            highlights.add(Highlight(outgoingEntry.x, outgoingEntry.y,  2))
+        if (outgoingEntry != null) {
+            highlights.add(Highlight(outgoingEntry.x, outgoingEntry.y, 2))
         }
         val incomingEntry = incomingDataSet.getEntryForIndex(index)
-        if ( incomingEntry != null) {
-            highlights.add(Highlight(incomingEntry.x, incomingEntry.y,  0))
+        if (incomingEntry != null) {
+            highlights.add(Highlight(incomingEntry.x, incomingEntry.y, 0))
         }
         val investedEntry = investedDataSet.getEntryForIndex(index)
-        if ( investedEntry != null) {
-            highlights.add(Highlight(investedEntry.x, investedEntry.y,  1))
+        if (investedEntry != null) {
+            highlights.add(Highlight(investedEntry.x, investedEntry.y, 1))
         }
-
         binding.lineChart.highlightValues(highlights.toTypedArray())
-
         currentHighlight = h
-
     }
 
     override fun onNothingSelected() {
@@ -306,7 +311,6 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
             TAG,
             "onChartGestureStart() called with: me = $me, lastPerformedGesture = $lastPerformedGesture"
         )
-
     }
 
     override fun onChartGestureEnd(me: MotionEvent?, lastPerformedGesture: ChartGesture?) {
@@ -358,8 +362,9 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
     override fun onChartTranslate(me: MotionEvent?, dX: Float, dY: Float) {
         Log.d(TAG, "onChartTranslate() called with: me = $me, dX = $dX, dY = $dY")
         val midPoint = binding.lineChart.centerOfView
-        val nearestHighlightPoint = binding.lineChart.getHighlightByTouchPoint(midPoint.x, midPoint.y)?: return
-        if( visibleIndex != nearestHighlightPoint.x.toInt()) {
+        val nearestHighlightPoint =
+            binding.lineChart.getHighlightByTouchPoint(midPoint.x, midPoint.y) ?: return
+        if (visibleIndex != nearestHighlightPoint.x.toInt()) {
             visibleIndex = nearestHighlightPoint.x.toInt()
             binding.lineChart.highlightValue(nearestHighlightPoint, true)
         }
@@ -402,91 +407,72 @@ class MonthValueFormatter : ValueFormatter() {
     }
 }
 
-// create a markerView extending IMarker that draws at center of the chart always
+class Marker(private val lineChart: LineChart) : IMarker {
 
-class CenterMarkerView(context: Context, private val layoutResource: Int, val lineChart: LineChart) : RelativeLayout(context), IMarker {
-
-    private lateinit var incomingLabel: TextView
-    private lateinit var investedLabel: TextView
-    private lateinit var outgoingLabel: TextView
-
-
-    init {
-        setUpLayoutResource()
-    }
-
-    private fun setUpLayoutResource() {
-        val inflated: View = LayoutInflater.from(context).inflate(layoutResource, this)
-        inflated.layoutParams =
-            LayoutParams(lineChart.measuredWidth, lineChart.measuredHeight)
-        inflated.measure(
-            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
-            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
-        )
-        inflated.layout(0, 0, inflated.measuredWidth, inflated.measuredHeight)
-
-        incomingLabel = findViewById<TextView>(R.id.incoming)
-        investedLabel = findViewById<TextView>(R.id.invested)
-        outgoingLabel = findViewById<TextView>(R.id.outgoing)
-    }
-
+    private var colorToPaint: Int = Color.BLACK
+    private var currentX = -1f
+    private var isLineDrawnForCurrentX = false
     override fun refreshContent(e: Entry?, highlight: Highlight?) {
-        incomingLabel.text = "${e?.y?.toInt()}"
-        investedLabel.text = "${e?.y?.toInt()}"
-        outgoingLabel.text = "${e?.y?.toInt()}"
+        Log.d(Companion.TAG, "refreshContent() called with: e = $e, highlight = $highlight")
+        val dataSet = lineChart.data.getDataSetByIndex(highlight?.dataSetIndex ?: 0)
+        val dataSetColor = dataSet.color
+        colorToPaint = dataSetColor
+        if(currentX != e?.x) {
+            isLineDrawnForCurrentX = false
+        }
+        currentX = e?.x ?: -1f
     }
 
     override fun draw(canvas: Canvas?, posX: Float, posY: Float) {
-        // take offsets into consideration
-//        val offset = getOffsetForDrawingAtPoint(posX, posY)
-        val width = measuredWidth
-        val height = measuredHeight
-        val chartWidth = lineChart?.width ?: 0
-        val saveId = canvas?.save()
-        canvas?.translate(chartWidth/2f - width/2f, 0f)
-        draw(canvas)
-        canvas?.restoreToCount(saveId!!)
-    }
+        Log.d(TAG, "onDraw() called with: canvas = $canvas")
+        // draw a line at the center of the chart
 
-    override fun getOffset(): MPPointF {
-        // center the marker horizontally and vertically
+        if(!isLineDrawnForCurrentX || posX != (canvas?.clipBounds?.right ?: (0f / 2f))) {
+            isLineDrawnForCurrentX = true
+            canvas?.drawLine(
+                canvas.clipBounds.right/2f,
+                0f,
+                canvas.clipBounds.right/2f,
+                lineChart.height.toFloat(),
+                Paint().apply {
+                    color = Color.GRAY
+                    strokeWidth = 2.dpToPx()
+                }
+            )
+        }
 
-        return MPPointF(0f, 0f)
+        val paint = Paint()
+        paint.color = colorToPaint
+        paint.style = Paint.Style.FILL
+        canvas?.drawCircle(posX, posY, 8.dpToPx(), paint)
+
     }
 
     override fun getOffsetForDrawingAtPoint(posX: Float, posY: Float): MPPointF {
-        return offset
+        Log.d(TAG, "getOffsetForDrawingAtPoint() called with: posX = $posX, posY = $posY")
+        return MPPointF(0f, 0f)
+    }
+
+    override fun getOffset(): MPPointF {
+        Log.d(TAG, "getOffset() called")
+        return MPPointF(0f, 0f)
+    }
+
+    companion object {
+        private const val TAG = "Marker"
     }
 }
 
+data class DrawCircle(
+    val x: Float,
+    val y: Float,
+    val radius: Float,
+    val color: Int
+)
 
-//class MyMarkerView(context: Context, layoutResource: Int) :RelativeLayout(context), IMarker {
-//
-//    private val incomingLabel = findViewById<TextView>(R.id.incoming)
-//    private val investedLabel = findViewById<TextView>(R.id.invested)
-//    private val outgoingLabel = findViewById<TextView>(R.id.outgoing)
-//
-//    var chart: LineChart? = null
-//
-//    override fun refreshContent(e: Entry?, highlight: Highlight?) {
-//
-//        incomingLabel.text = "${e?.y?.toInt()}"
-//        investedLabel.text = "${e?.y?.toInt()}"
-//        outgoingLabel.text = "${e?.y?.toInt()}"
-//
-//        super.refreshContent(e, highlight)
-//    }
-//
-//    override fun getOffsetForDrawingAtPoint(posX: Float, posY: Float): MPPointF {
-//        // get screen width
-//        val width = context.resources.displayMetrics.widthPixels
-//
-//        return MPPointF(0f, 0f)
-//    }
-//
-//    override fun getOffset(): MPPointF {
-//        val width = context.resources.displayMetrics.widthPixels
-//        return MPPointF(0f, 0f)
-//    }
-//}
+fun Int.dpToPx(): Float {
+    val displayMetrics = Resources.getSystem().displayMetrics
+    return (this * displayMetrics.density + 0.5f)
+}
+
 

@@ -15,17 +15,6 @@
         android:id="@+id/lineChart"
         />
 
-    <View
-        android:layout_width="4dp"
-        android:layout_height="0dp"
-        android:background="#BCBCBC"
-        app:layout_constraintBottom_toBottomOf="@id/lineChart"
-        app:layout_constraintEnd_toEndOf="@id/lineChart"
-        app:layout_constraintStart_toStartOf="@id/lineChart"
-        app:layout_constraintTop_toTopOf="@id/lineChart"
-
-        />
-
     <TextView
         android:id="@+id/textview_first"
         android:layout_width="wrap_content"
