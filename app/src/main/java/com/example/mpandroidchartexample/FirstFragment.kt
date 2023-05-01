@@ -1,18 +1,8 @@
 package com.example.mpandroidchartexample
 
-import android.content.Context
 import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.drawable.Drawable
-import android.media.SoundPool
-import android.os.Build
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.Vibrator
 import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -20,18 +10,12 @@ import android.view.MotionEvent
 import android.view.SoundEffectConstants
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.mpandroidchartexample.databinding.FragmentFirstBinding
-import com.github.mikephil.charting.charts.Chart
-import com.github.mikephil.charting.charts.LineChart
+import com.example.mpandroidchartexample.foldlinechart.FoldLineChartMarker
 import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.components.IMarker
-import com.github.mikephil.charting.components.MarkerImage
-import com.github.mikephil.charting.components.MarkerView
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -181,23 +165,6 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
                     circleHoleColor = Color.WHITE
                     circleHoleRadius = 4f
                     lineWidth = 4f
-//                    when(index) {
-//                        0 -> {
-//                            fillColor = Color.parseColor("#66FF0000")
-//                            setCircleColor(Color.parseColor("#FF0000"))
-//                            setColors(Color.parseColor("#FF0000"))
-//                        }
-//                        1 -> {
-//                            fillColor = Color.parseColor("#660000FF")
-//                            setCircleColor(Color.parseColor("#0000FF"))
-//                            setColors(Color.parseColor("#0000FF"))
-//                        }
-//                        2 -> {
-//                            fillColor = Color.parseColor("#6600FF00")
-//                            setCircleColor(Color.parseColor("#00FF00"))
-//                            setColors(Color.parseColor("#00FF00"))
-//                        }
-//                    }
                 }
             }
 
@@ -206,18 +173,26 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
             this.data = lineData
             xAxis.apply {
                 valueFormatter = MonthValueFormatter()
-                gridLineWidth = 0f
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(true)
-                setDrawAxisLine(true)
+                gridColor = Color.parseColor("#A4A4A4")
+                gridLineWidth = 2f
                 setDrawLabels(true)
+                xAxis.gridColor = Color.parseColor("#A4A4A4")
                 axisMaximum = 18f
                 axisMinimum = -3.5f
 //                setLabelCount(12, false)
+                setDrawAxisLine(false)
             }
             axisLeft.isEnabled = false
-            axisRight.isEnabled = false
-            axisRight.setDrawLabels(false)
+            axisRight.apply {
+                isEnabled = true
+                gridColor = Color.parseColor("#A4A4A4")
+                gridLineWidth = 2f
+                setDrawGridLines(true)
+                setDrawAxisLine(false)
+                setDrawLabels(false)
+            }
             description.isEnabled = false
             legend.isEnabled = false
             setPinchZoom(false)
@@ -231,23 +206,15 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
             isScaleYEnabled = false
             isDoubleTapToZoomEnabled = false
             isHighlightPerDragEnabled = true
-//            setDrawGridBackground(true)
-//            setDrawBorders(true)
-//            setExtraOffsets(
-//                0f,
-//                resources.getDimensionPixelSize(R.dimen.chart_padding_top).toFloat(),
-//                0f,
-//                resources.getDimensionPixelSize(R.dimen.chart_padding_bottom).toFloat()
-//            )
 
             setOnChartValueSelectedListener(this@FirstFragment)
             onChartGestureListener = this@FirstFragment
 
             // drag
             isDragDecelerationEnabled = true
-            dragDecelerationFrictionCoef = 0.3f
+            dragDecelerationFrictionCoef = 0.2f
 
-            marker = Marker(this)
+            marker = FoldLineChartMarker(this)
 
             invalidate()
             if (highlighted == null || highlighted?.isEmpty() == true) {
@@ -302,9 +269,7 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
         currentHighlight = h
     }
 
-    override fun onNothingSelected() {
-
-    }
+    override fun onNothingSelected() {}
 
     override fun onChartGestureStart(me: MotionEvent?, lastPerformedGesture: ChartGesture?) {
         Log.d(
@@ -319,7 +284,12 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
             "onChartGestureEnd() called with: me = $me, lastPerformedGesture = $lastPerformedGesture"
         )
         //mid point of the chart
-        val midPoint = binding.lineChart.centerOfView
+        val midPoint =
+            when (lastPerformedGesture) {
+                ChartGesture.LONG_PRESS, ChartGesture.SINGLE_TAP -> MPPointF(me?.x ?: 0f, me?.y ?: 0f)
+                ChartGesture.DRAG -> binding.lineChart.centerOfView
+                else -> return
+            }
         val nextHightlightPoint = binding.lineChart.getHighlightByTouchPoint(midPoint.x, midPoint.y)
         // settle chart on nearest point
         if (nextHightlightPoint != null) {
@@ -345,7 +315,7 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
     }
 
     override fun onChartSingleTapped(me: MotionEvent?) {
-
+        Log.d(TAG, "onChartSingleTapped() called with: me = $me")
     }
 
     override fun onChartFling(
@@ -354,6 +324,10 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
         velocityX: Float,
         velocityY: Float
     ) {
+        Log.d(
+            TAG,
+            "onChartFling() called with: me1 = $me1, me2 = $me2, velocityX = $velocityX, velocityY = $velocityY"
+        )
     }
 
     override fun onChartScale(me: MotionEvent?, scaleX: Float, scaleY: Float) {
@@ -374,21 +348,6 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
 // create value formatter for x axis for month names from march to april
 class MonthValueFormatter : ValueFormatter() {
     override fun getAxisLabel(value: Float, axis: AxisBase?): String {
-//        return when (value.toInt().rem(12)) {
-//            0 -> "Jan"
-//            1 -> "Feb"
-//            2 -> "Mar"
-//            3 -> "Apr"
-//            4 -> "May"
-//            5 -> "Jun"
-//            6 -> "Jul"
-//            7 -> "Aug"
-//            8 -> "Sep"
-//            9 -> "Oct"
-//            10 -> "Nov"
-//            11 -> "Dec"
-//            else -> ""
-//        }
         return when (value.toInt().rem(12)) {
             0 -> "Mar"
             1 -> "Apr"
@@ -407,68 +366,7 @@ class MonthValueFormatter : ValueFormatter() {
     }
 }
 
-class Marker(private val lineChart: LineChart) : IMarker {
 
-    private var colorToPaint: Int = Color.BLACK
-    private var currentX = -1f
-    private var isLineDrawnForCurrentX = false
-    override fun refreshContent(e: Entry?, highlight: Highlight?) {
-        Log.d(Companion.TAG, "refreshContent() called with: e = $e, highlight = $highlight")
-        val dataSet = lineChart.data.getDataSetByIndex(highlight?.dataSetIndex ?: 0)
-        val dataSetColor = dataSet.color
-        colorToPaint = dataSetColor
-        if(currentX != e?.x) {
-            isLineDrawnForCurrentX = false
-        }
-        currentX = e?.x ?: -1f
-    }
-
-    override fun draw(canvas: Canvas?, posX: Float, posY: Float) {
-        Log.d(TAG, "onDraw() called with: canvas = $canvas")
-        // draw a line at the center of the chart
-
-        if(!isLineDrawnForCurrentX || posX != (canvas?.clipBounds?.right ?: (0f / 2f))) {
-            isLineDrawnForCurrentX = true
-            canvas?.drawLine(
-                canvas.clipBounds.right/2f,
-                0f,
-                canvas.clipBounds.right/2f,
-                lineChart.height.toFloat(),
-                Paint().apply {
-                    color = Color.GRAY
-                    strokeWidth = 2.dpToPx()
-                }
-            )
-        }
-
-        val paint = Paint()
-        paint.color = colorToPaint
-        paint.style = Paint.Style.FILL
-        canvas?.drawCircle(posX, posY, 8.dpToPx(), paint)
-
-    }
-
-    override fun getOffsetForDrawingAtPoint(posX: Float, posY: Float): MPPointF {
-        Log.d(TAG, "getOffsetForDrawingAtPoint() called with: posX = $posX, posY = $posY")
-        return MPPointF(0f, 0f)
-    }
-
-    override fun getOffset(): MPPointF {
-        Log.d(TAG, "getOffset() called")
-        return MPPointF(0f, 0f)
-    }
-
-    companion object {
-        private const val TAG = "Marker"
-    }
-}
-
-data class DrawCircle(
-    val x: Float,
-    val y: Float,
-    val radius: Float,
-    val color: Int
-)
 
 fun Int.dpToPx(): Float {
     val displayMetrics = Resources.getSystem().displayMetrics
