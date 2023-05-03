@@ -181,8 +181,9 @@ class FoldLineChartView @JvmOverloads constructor(
             setOnChartValueSelectedListener(this@FoldLineChartView)
             onChartGestureListener = this@FoldLineChartView
             // drag
-            isDragDecelerationEnabled = true
-            dragDecelerationFrictionCoef = 0.3f
+            isDragDecelerationEnabled = false
+
+            extraBottomOffset = 16f
 
             marker = FoldLineChartMarker(this)
 

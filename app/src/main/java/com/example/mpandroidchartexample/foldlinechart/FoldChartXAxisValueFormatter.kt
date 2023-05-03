@@ -1,11 +1,10 @@
 package com.example.mpandroidchartexample.foldlinechart
 
 import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
 
-class FoldChartXAxisValueFormatter(private val labels: List<String>) : ValueFormatter() {
-    override fun getAxisLabel(value: Float, axis: AxisBase?): String {
-        // todo verify behaviour if needed to produce repeating labels after the end of the list
+class FoldChartXAxisValueFormatter(private val labels: List<String>) : IAxisValueFormatter {
+    override fun getFormattedValue(value: Float, axis: AxisBase?): String {
         val index = value.toInt().rem(labels.size)
         return if(index in labels.indices) {
             labels[index]

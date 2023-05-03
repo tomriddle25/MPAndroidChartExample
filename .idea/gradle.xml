@@ -10,6 +10,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/MPAndroidChart/MPChartExample" />
+            <option value="$PROJECT_DIR$/MPAndroidChart/MPChartLib" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>

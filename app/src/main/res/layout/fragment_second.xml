@@ -24,7 +24,7 @@
         app:layout_constraintBottom_toBottomOf="@id/fold_chart_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="14dp"
+        android:layout_marginBottom="30dp"
         app:layout_constraintTop_toTopOf="@id/fold_chart_view" />
         />
     <TextView

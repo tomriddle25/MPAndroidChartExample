@@ -20,7 +20,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.ChartTouchListener.ChartGesture
 import com.github.mikephil.charting.listener.OnChartGestureListener
@@ -212,7 +212,7 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
 
             // drag
             isDragDecelerationEnabled = true
-            dragDecelerationFrictionCoef = 0.2f
+            dragDecelerationFrictionCoef = 0.6f
 
             marker = FoldLineChartMarker(this)
 
@@ -346,8 +346,9 @@ class FirstFragment : Fragment(), OnChartValueSelectedListener, OnChartGestureLi
 }
 
 // create value formatter for x axis for month names from march to april
-class MonthValueFormatter : ValueFormatter() {
-    override fun getAxisLabel(value: Float, axis: AxisBase?): String {
+class MonthValueFormatter : IAxisValueFormatter {
+
+    override fun getFormattedValue(value: Float, axis: AxisBase?): String {
         return when (value.toInt().rem(12)) {
             0 -> "Mar"
             1 -> "Apr"
