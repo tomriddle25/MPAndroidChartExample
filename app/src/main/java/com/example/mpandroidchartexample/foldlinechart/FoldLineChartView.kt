@@ -11,10 +11,12 @@ import android.view.SoundEffectConstants
 import android.widget.LinearLayout
 import com.example.mpandroidchartexample.R
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IAxisStyleFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.ChartTouchListener
 import com.github.mikephil.charting.listener.OnChartGestureListener
@@ -197,6 +199,21 @@ class FoldLineChartView @JvmOverloads constructor(
         chart.xAxis.apply {
             labelList?.let {
                 valueFormatter = FoldChartXAxisValueFormatter(it)
+                axisLabelStyleFormatter = object : IAxisStyleFormatter {
+                    override fun getTypefaceForAxisValue(value: Float, axis: AxisBase?): Typeface {
+                        return if(value == visibleIndex.toFloat()) {
+                            Typeface.DEFAULT_BOLD
+                        } else
+                            Typeface.DEFAULT
+                    }
+
+                    override fun getTextColorForAxisValue(value: Float, axis: AxisBase?): Int {
+                        return if(value == visibleIndex.toFloat()) {
+                            Color.BLACK
+                        } else
+                            Color.GRAY
+                    }
+                }
             }
             position = XAxis.XAxisPosition.BOTTOM
             setDrawGridLines(drawGridLines)
