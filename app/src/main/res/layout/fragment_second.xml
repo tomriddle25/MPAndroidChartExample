@@ -21,6 +21,7 @@
         android:layout_width="2dp"
         android:layout_height="0dp"
         android:background="#8E8E8E"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/fold_chart_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

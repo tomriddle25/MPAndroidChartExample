@@ -22,7 +22,6 @@ class FoldLineChartMarker(private val lineChart: LineChart) : IMarker {
         Log.d(TAG, "refreshContent() called with: e = $e, highlight = $highlight")
         val dataSet = lineChart.data.getDataSetByIndex(highlight?.dataSetIndex ?: 0)
         val dataSetColor = dataSet.color
-//        colorToPaint = dataSetColor
         paint.color = dataSetColor
     }
 

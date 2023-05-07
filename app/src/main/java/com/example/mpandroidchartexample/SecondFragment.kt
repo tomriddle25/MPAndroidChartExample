@@ -86,11 +86,15 @@ class SecondFragment : Fragment() {
                 )
             )
 
+
+
             lineColors = listOf(
                 ContextCompat.getColor(requireContext(), R.color.green),
                 ContextCompat.getColor(requireContext(), R.color.blue),
                 ContextCompat.getColor(requireContext(), R.color.red)
             )
+
+            initialHighlightIndex = 3f
             // set months March to April as label list
             labelList = listOf(
                 "Mar",
@@ -115,6 +119,9 @@ class SecondFragment : Fragment() {
             )
             labelTextColor = Color.GRAY
             labelSizeSp = 12f
+
+            // verttical line
+            drawStaticCenteredVerticalLine = true
 
             chartHighlightChangedListener = object : ChartHighlightChangedListener {
                 override fun onHighlightChanged(index: Int) {

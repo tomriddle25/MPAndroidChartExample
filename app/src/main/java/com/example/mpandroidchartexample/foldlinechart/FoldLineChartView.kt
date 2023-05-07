@@ -1,6 +1,7 @@
 package com.example.mpandroidchartexample.foldlinechart
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.Typeface
 import android.util.AttributeSet
@@ -13,6 +14,7 @@ import com.example.mpandroidchartexample.R
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -117,6 +119,30 @@ class FoldLineChartView @JvmOverloads constructor(
 
     var chartHighlightChangedListener: ChartHighlightChangedListener? = null
 
+    var initialHighlightIndex = 0f
+        set(value) {
+            field = value
+            updateChart()
+        }
+
+    var drawStaticCenteredVerticalLine = false
+        set(value) {
+            field = value
+            updateChart()
+        }
+
+    var staticCenteredVerticalLineColor = Color.LTGRAY
+        set(value) {
+            field = value
+            updateChart()
+        }
+
+    var staticCenteredVerticalLineWidthDp = 2f
+        set(value) {
+            field = value
+            updateChart()
+        }
+
     /*
     * Private properties
     * */
@@ -189,8 +215,14 @@ class FoldLineChartView @JvmOverloads constructor(
 
             marker = FoldLineChartMarker(this)
 
-            if (highlighted == null || highlighted?.isEmpty() == true) {
-                highlightValue(0f, 0)
+            notifyDataSetChanged()
+
+            if(initialHighlightIndex != 0f) {
+                // scroll to initial highlight
+                centerViewTo(initialHighlightIndex, 0f, YAxis.AxisDependency.LEFT)
+                highlightValue(initialHighlightIndex, 0)
+            } else if (highlighted == null || highlighted?.isEmpty() == true) {
+                highlightValue(initialHighlightIndex, 0)
             }
         }
     }
@@ -241,6 +273,9 @@ class FoldLineChartView @JvmOverloads constructor(
                 setDrawGridLines(drawGridLines)
                 setDrawAxisLine(false)
                 setDrawLabels(false)
+                setDrawStaticCenterVerticalLine(drawStaticCenteredVerticalLine)
+                staticCenterVerticalLineColor = staticCenteredVerticalLineColor
+                staticCenterVerticalLineWidth = staticCenteredVerticalLineWidthDp
             }
         }
     }
